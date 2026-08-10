@@ -1,0 +1,23 @@
+# 大文件
+data/
+tmp/
+
+# Python
+venv/
+lib/
+__pycache__/
+*.pyc
+
+# 模型
+*.pt
+*.pth
+
+# 杂项
+Project.pdf
+=*
+*.zip
+
+# IDE
+.idea/
+.vscode/
+.claude/

@@ -1,0 +1,21 @@
+# COMP5434 Big Data Project Dependencies
+
+# PySpark - Big Data Distributed Processing Framework
+pyspark>=4.0.0
+
+# Deep Learning
+torch>=2.6.0
+transformers>=4.40.0
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+pyarrow>=14.0.0
+
+# Utilities
+py-cpuinfo>=9.0.0
+tqdm>=4.66.0
+
+# Kaggle
+kaggle>=1.6.0
