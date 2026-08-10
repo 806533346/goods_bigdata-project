@@ -149,7 +149,8 @@ big_data_trea/
 
 | 软件 | 版本 |
 |------|------|
-| Python | 3.10+ (3.13 推荐) |
+| 操作系统 | Ubuntu 22.04 LTS |
+| Python | 3.10+ |
 | Java | 8+ (JDK 21 兼容) |
 | PyTorch | 2.6.0+ (CUDA 12.4) |
 | PySpark | 4.0.0+ |
