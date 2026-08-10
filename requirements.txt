@@ -1,0 +1,16 @@
+# COMP5434 Cloud - Full Dependencies
+# Includes orchestration (Prefect) + cloud SDK + all ML deps
+
+-r requirements-spark.txt
+-r requirements-torch.txt
+
+# Orchestration
+prefect>=3.0.0
+
+# Cloud SDKs (install based on provider)
+# boto3>=1.35.0          # AWS S3 / Alibaba Cloud OSS (S3-compatible)
+# oss2>=2.19.0            # Alibaba Cloud OSS native SDK
+# google-cloud-storage    # GCP GCS
+
+# Monitoring (optional)
+# mlflow>=2.15.0

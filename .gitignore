@@ -1,0 +1,42 @@
+# COMP5434 Project — .gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# 大文件 (数据 + 模型)
+data/
+*.pt
+*.pth
+output/*.pt
+output/*.csv
+output/*.json
+
+# 敏感配置 (含真实 IP)
+configs/cluster_inventory.sh
+configs/cluster_env.sh
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.tar
+
+# 临时文件
+tmp/
+/tmp/
+*.log
+nohup.out
+
+# 压缩包
+*.zip

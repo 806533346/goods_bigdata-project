@@ -1,0 +1,113 @@
+# ============================================================
+# COMP5434 Cloud - Local Dev Environment
+# Runs Spark + PyTorch containers on a single machine.
+#
+# Usage:
+#   docker compose up -d              # start all services
+#   docker compose run spark-master   # run Spark job
+#   docker compose run gpu-trainer    # run GPU training
+#   docker compose down               # stop all
+# ============================================================
+version: "3.8"
+
+services:
+  # ---- Spark Master (Standalone Cluster) ----
+  spark-master:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.spark
+    image: comp5434/spark-runner:latest
+    container_name: spark-master
+    hostname: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_DRIVER_MEMORY=8g
+    ports:
+      - "8080:8080"   # Spark Master Web UI
+      - "7077:7077"   # Spark Master RPC
+    volumes:
+      - ../data:/app/data:ro
+      - ../output:/app/output
+      - spark-logs:/opt/spark/logs
+    networks:
+      - spark-net
+
+  # ---- Spark Worker 1 ----
+  spark-worker-1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.spark
+    image: comp5434/spark-runner:latest
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=4
+      - SPARK_WORKER_MEMORY=12G
+    ports:
+      - "8081:8081"
+    volumes:
+      - spark-shuffle:/tmp/spark-shuffle
+    networks:
+      - spark-net
+    depends_on:
+      - spark-master
+
+  # ---- Spark Worker 2 ----
+  spark-worker-2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.spark
+    image: comp5434/spark-runner:latest
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=4
+      - SPARK_WORKER_MEMORY=12G
+    ports:
+      - "8082:8081"
+    volumes:
+      - spark-shuffle:/tmp/spark-shuffle
+    networks:
+      - spark-net
+    depends_on:
+      - spark-master
+
+  # ---- GPU Trainer (single GPU by default) ----
+  gpu-trainer:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.torch
+    image: comp5434/torch-trainer:latest
+    container_name: gpu-trainer
+    environment:
+      - HF_ENDPOINT=https://hf-mirror.com
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ../data:/app/data
+      - ../output:/app/output
+      - hf-cache:/root/.cache/huggingface
+    networks:
+      - spark-net
+    # Override CMD for single-GPU mode
+    command: python3 /app/src/finetune_roberta_ddp.py --local
+
+volumes:
+  spark-logs:
+  spark-shuffle:
+  hf-cache:
+
+networks:
+  spark-net:
+    driver: bridge

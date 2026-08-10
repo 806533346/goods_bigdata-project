@@ -1,0 +1,58 @@
+# ============================================================
+# COMP5434 Cloud - Distributed Spark Cluster (Cloud Deploy)
+# Deploy on 3 VMs: 1 master + 2 workers.
+#
+# On master VM:
+#   docker compose -f docker-compose.spark.yml up spark-master
+#
+# On each worker VM:
+#   export SPARK_MASTER_IP=<master-private-ip>
+#   docker compose -f docker-compose.spark.yml up spark-worker
+#
+# Or single-machine test:
+#   docker compose -f docker-compose.spark.yml up --scale spark-worker=2
+# ============================================================
+version: "3.8"
+
+services:
+  spark-master:
+    image: registry.cn-hangzhou.aliyuncs.com/comp5434/spark-runner:latest
+    container_name: spark-master
+    hostname: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - spark-logs:/opt/spark/logs
+    networks:
+      - spark-cluster
+    restart: unless-stopped
+
+  spark-worker:
+    image: registry.cn-hangzhou.aliyuncs.com/comp5434/spark-runner:latest
+    hostname: spark-worker-{{.Task.Slot}}
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=${SPARK_WORKER_CORES:-8}
+      - SPARK_WORKER_MEMORY=${SPARK_WORKER_MEMORY:-28G}
+    volumes:
+      - spark-shuffle:/tmp/spark-shuffle
+    networks:
+      - spark-cluster
+    depends_on:
+      - spark-master
+    deploy:
+      replicas: 2
+
+volumes:
+  spark-logs:
+  spark-shuffle:
+
+networks:
+  spark-cluster:
+    driver: bridge

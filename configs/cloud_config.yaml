@@ -1,0 +1,79 @@
+# ============================================================
+# COMP5434 Cloud - Central Cloud Configuration
+# Provider-agnostic. Override via environment variables.
+# ============================================================
+
+# ---- Cloud Provider Selection ----
+# Options: aliyun | aws | gcp | azure
+cloud:
+  provider: ${CLOUD_PROVIDER:-aliyun}
+  region: ${CLOUD_REGION:-cn-hangzhou}
+
+# ---- Object Storage ----
+storage:
+  # Alibaba Cloud OSS
+  oss:
+    endpoint: ${OSS_ENDPOINT:-oss-cn-hangzhou.aliyuncs.com}
+    bucket: ${OSS_BUCKET:-comp5434-bucket}
+    access_key_id: ${OSS_ACCESS_KEY_ID:-}
+    access_key_secret: ${OSS_ACCESS_KEY_SECRET:-}
+
+  # AWS S3 (alternative)
+  s3:
+    endpoint: ${S3_ENDPOINT:-s3.amazonaws.com}
+    bucket: ${S3_BUCKET:-comp5434-bucket}
+    region: ${AWS_REGION:-us-east-1}
+
+# ---- Container Registry ----
+registry:
+  # Alibaba Cloud ACR
+  acr:
+    endpoint: ${ACR_ENDPOINT:-registry.cn-hangzhou.aliyuncs.com}
+    namespace: ${ACR_NAMESPACE:-comp5434}
+
+  # Docker Hub (alternative)
+  dockerhub:
+    namespace: ${DOCKERHUB_USER:-comp5434}
+
+# ---- Spark Cluster ----
+spark:
+  app_name: "COMP5434_RatingPrediction_Cloud"
+  master: ${SPARK_MASTER:-spark://spark-master:7077}
+  driver_memory: ${SPARK_DRIVER_MEMORY:-8g}
+  executor_memory: ${SPARK_EXECUTOR_MEMORY:-24g}
+  executor_cores: ${SPARK_EXECUTOR_CORES:-8}
+  shuffle_partitions: ${SPARK_SHUFFLE_PARTITIONS:-64}
+  driver_max_result_size: "4g"
+
+  # Standalone mode (single VM)
+  standalone:
+    master: "local[*]"
+    driver_memory: "16g"
+    shuffle_partitions: 32
+
+# ---- DDP Training (Multi-GPU) ----
+ddp:
+  backend: "nccl"
+  master_addr: ${MASTER_ADDR:-localhost}
+  master_port: ${MASTER_PORT:-29500}
+  nproc_per_node: ${NPROC_PER_NODE:-1}  # GPUs per node
+  nnodes: ${NNODES:-1}                    # Number of nodes
+
+# ---- Model Hyperparameters ----
+model:
+  name: "roberta-base"
+  max_length: 192
+  batch_size: 32
+  grad_accum: 1
+  epochs: 1
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  max_grad_norm: 1.0
+  val_size: 50000
+
+  # Subset for quick experiments
+  subset_size: null  # null = full data (3M), or set to e.g. 500000
+
+# ---- Reproducibility ----
+seed: 42

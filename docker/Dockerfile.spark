@@ -1,0 +1,40 @@
+# ============================================================
+# COMP5434 Cloud - Spark Runner Image
+# For distributed Spark feature engineering on CPU cluster
+# ============================================================
+FROM bitnami/spark:3.5.3-debian-12-r0
+
+USER root
+
+# Install Python and build tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip python3-dev curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python deps for Spark jobs
+COPY requirements-spark.txt /tmp/requirements-spark.txt
+RUN pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements-spark.txt
+
+# Add cloud storage connectors
+# Alibaba Cloud OSS (S3-compatible)
+ADD https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aliyun/3.3.6/hadoop-aliyun-3.3.6.jar \
+    /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/com/aliyun/oss/aliyun-sdk-oss/3.17.4/aliyun-sdk-oss-3.17.4.jar \
+    /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/org/jdom/jdom2/2.0.6.1/jdom2-2.0.6.1.jar \
+    /opt/bitnami/spark/jars/
+
+# AWS S3
+ADD https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.6/hadoop-aws-3.3.6.jar \
+    /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.725/aws-java-sdk-bundle-1.12.725.jar \
+    /opt/bitnami/spark/jars/
+
+USER 1001
+WORKDIR /app
+
+COPY src/ /app/src/
+COPY configs/ /app/configs/
+
+# Default command: run Spark feature engineering
+CMD ["spark-submit", "--master", "local[*]", "--driver-memory", "8g", "/app/src/spark_features_cloud.py"]

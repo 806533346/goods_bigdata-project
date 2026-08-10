@@ -1,0 +1,7 @@
+# COMP5434 Cloud - Spark Dependencies
+# Minimal image: PySpark distributed feature engineering only
+
+pyspark>=4.0.0
+pyarrow>=14.0.0
+numpy>=1.24.0
+pandas>=2.0.0
