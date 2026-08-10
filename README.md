@@ -1,4 +1,4 @@
-# COMP5434 Big Data Project: Review Rating Prediction
+# Kaggle COMP5434 Big Data Project: Review Rating Prediction
 
 预测电商平台评论评分（1-5分）的大数据分析项目。使用 **Apache Spark** 进行分布式数据预处理与特征工程，结合 **RoBERTa-base** 深度学习模型进行端到端微调，实现高精度的评分预测。
 
@@ -438,15 +438,6 @@ kaggle competitions submit -c comp-5434-2526-sem-3-project \
 2. **通过网页提交**：
 
 访问 [Kaggle 竞赛页面](https://www.kaggle.com/t/9e897d08dba249bb8a1312666e8ef8fd)，上传 `output/submission.csv`。
-
----
-
-## 贡献者
-
-| 成员 | 贡献 | 占比 |
-|------|------|------|
-| [姓名] | 模型设计、PyTorch 实现、微调训练 | 50% |
-| [姓名] | PySpark 管道、特征工程、性能评估 | 50% |
 
 ---
 
